@@ -8,6 +8,8 @@ import { Pie, PieChart, ResponsiveContainer, Cell, Tooltip } from "recharts"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { AlertCircle } from "lucide-react"
+import { submitInvestorForm } from "@/lib/airtable"
 
 const fundAllocation = [
   { name: "Product Development", value: 40 },
@@ -19,13 +21,51 @@ const fundAllocation = [
 const COLORS = ["#1DB48C", "#1A3A5F", "#3B82F6", "#EF4444"]
 
 export default function InvestmentOpportunity() {
-  const [email, setEmail] = useState("")
-  const [showPitchDeck, setShowPitchDeck] = useState(false)
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    message: "",
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isError, setIsError] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically send the email to your backend
-    setShowPitchDeck(true)
+
+    if (!formData.email || !formData.fullName) {
+      return // Basic validation
+    }
+
+    setIsSubmitting(true)
+    setIsError(false)
+
+    try {
+      // Envoyer les données à Airtable
+      await submitInvestorForm({
+        fullName: formData.fullName,
+        email: formData.email,
+        company: formData.fullName, // Utiliser le nom comme entreprise si non spécifié
+        investorType: "Other", // Valeur par défaut
+        investmentInterest: "To be discussed", // Valeur par défaut
+        requestDocumentation: true, // Demande de documentation
+      })
+
+      setIsSubmitted(true)
+    } catch (error) {
+      console.error("Error submitting investor form:", error)
+      setIsError(true)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -75,58 +115,86 @@ export default function InvestmentOpportunity() {
 
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
             <h3 className="text-2xl font-semibold text-navy-900 mb-6">Secure Your Spot in the Privacy Revolution</h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-navy-900 mb-1">
-                  Name
-                </label>
-                <Input id="name" placeholder="Your Name" className="w-full" />
-              </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-navy-900 mb-1">
-                  Email
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-navy-900 mb-1">
-                  Message
-                </label>
-                <Textarea id="message" placeholder="Tell us about your interest in investing" className="w-full" />
-              </div>
-              <Button type="submit" className="w-full bg-turquoise-500 hover:bg-turquoise-600 text-white">
-                Request Investor Information
-              </Button>
-            </form>
+
+            {!isSubmitted ? (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="fullName" className="block text-sm font-medium text-navy-900 mb-1">
+                    Name
+                  </label>
+                  <Input
+                    id="fullName"
+                    placeholder="Your Name"
+                    className="w-full"
+                    value={formData.fullName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-navy-900 mb-1">
+                    Email
+                  </label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-navy-900 mb-1">
+                    Message
+                  </label>
+                  <Textarea
+                    id="message"
+                    placeholder="Tell us about your interest in investing"
+                    className="w-full text-navy-900"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                {isError && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+                    <AlertCircle className="h-6 w-6 text-red-500 mx-auto mb-2" />
+                    <p className="text-red-600">There was an error submitting your request. Please try again.</p>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  className="w-full bg-turquoise-500 hover:bg-turquoise-600 text-white"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Request Investor Information"}
+                </Button>
+              </form>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="bg-gray-50 p-6 rounded-lg shadow-sm text-center"
+              >
+                <h3 className="text-2xl font-semibold text-navy-900 mb-4">Thank you for your interest!</h3>
+                <p className="text-navy-600 mb-6">
+                  Download our pitch deck to learn more about this exciting opportunity.
+                </p>
+                <Button
+                  onClick={() => window.open("/pitch-deck-consentd.pdf", "_blank")}
+                  className="bg-navy-900 hover:bg-navy-800 text-white"
+                >
+                  Download Pitch Deck
+                </Button>
+              </motion.div>
+            )}
           </motion.div>
         </div>
-
-        {showPitchDeck && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
-          >
-            <h3 className="text-2xl font-semibold text-navy-900 mb-4">Thank you for your interest!</h3>
-            <p className="text-navy-600 mb-4">Download our pitch deck to learn more about this exciting opportunity.</p>
-            <Button
-              onClick={() => window.open("/path-to-your-pitch-deck.pdf", "_blank")}
-              className="bg-navy-900 hover:bg-navy-800 text-white"
-            >
-              Download Pitch Deck
-            </Button>
-          </motion.div>
-        )}
       </div>
     </section>
   )
 }
-

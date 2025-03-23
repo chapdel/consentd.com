@@ -29,7 +29,7 @@ export default function CompanyInfo() {
       <div>
         <h2 className="text-2xl font-semibold text-navy-900 mb-4">Schedule a Meeting</h2>
         <Button
-          onClick={() => window.open("https://calendly.com/cecile-consentd/30min", "_blank")}
+          onClick={() => window.open("https://calendly.com/consentd", "_blank")}
           className="w-full bg-turquoise-500 hover:bg-turquoise-600 text-white"
         >
           <Calendar className="mr-2 h-4 w-4" /> Book a Time

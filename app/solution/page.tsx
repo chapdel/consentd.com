@@ -3,6 +3,7 @@ import Navbar from "@/components/navbar"
 import InnerPageHero from "@/components/inner-page-hero"
 import SolutionOverview from "@/components/solution/overview"
 import Technology from "@/components/solution/technology"
+import PlatformPreview from "@/components/solution/platform-preview"
 import RevenuePotential from "@/components/solution/revenue-potential"
 import FAQ from "@/components/solution/faq"
 import Footer from "@/components/footer"
@@ -24,6 +25,7 @@ export default function SolutionPage() {
       />
       <SolutionOverview />
       <Technology />
+      <PlatformPreview />
       <RevenuePotential />
       <FAQ />
       <Footer />

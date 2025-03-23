@@ -59,14 +59,17 @@ export default function BusinessCTA() {
   return (
     <section className="py-20 bg-gradient-to-br from-navy-900 to-turquoise-900 text-white">
       <div className="container mx-auto px-4">
-        <motion.h2
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-3xl md:text-4xl font-bold text-center mb-12"
+          className="text-center mb-12 max-w-3xl mx-auto"
         >
-          Ready to access high-quality, ethical data?
-        </motion.h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">The Ethical Data Future Starts Now</h2>
+          <p className="text-xl">
+            The best data isn't bought. It's earned with trust. Welcome to a new era of consent-driven intelligence.
+          </p>
+        </motion.div>
 
         <div className="max-w-2xl mx-auto">
           <motion.div
@@ -75,6 +78,10 @@ export default function BusinessCTA() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="bg-white rounded-lg p-8 shadow-xl"
           >
+            <h3 className="text-2xl font-bold text-navy-900 mb-6 text-center">
+              Get early access to the Consentd marketplace today
+            </h3>
+
             {!isSubmitted ? (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -125,7 +132,7 @@ export default function BusinessCTA() {
                   </label>
                   <Textarea
                     id="message"
-                    placeholder="How can we help you?"
+                    placeholder="Tell us about your data needs"
                     className="w-full text-navy-900"
                     value={formData.message}
                     onChange={handleInputChange}
@@ -142,15 +149,17 @@ export default function BusinessCTA() {
                 <div className="flex items-center space-x-4">
                   <Button
                     type="submit"
-                    className="bg-turquoise-500 hover:bg-turquoise-600 text-white"
+                    className="bg-turquoise-500 hover:bg-turquoise-600 text-white w-full"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? "Sending..." : "Send Message"}
+                    {isSubmitting ? "Sending..." : "Request Early Access"}
                   </Button>
+                </div>
+                <div className="text-center">
                   <Button
                     type="button"
                     variant="outline"
-                    className="border-turquoise-500 text-turquoise-500 hover:bg-turquoise-50"
+                    className="border-navy-500 text-navy-500 hover:bg-navy-50"
                     onClick={() => window.open("https://calendly.com/cecile-consentd/30min", "_blank")}
                   >
                     <Calendar className="mr-2 h-4 w-4" />
@@ -161,12 +170,14 @@ export default function BusinessCTA() {
             ) : (
               <div className="text-center">
                 <h3 className="text-2xl font-bold text-navy-900 mb-4">Thank You!</h3>
-                <p className="text-navy-600 mb-6">We've received your message and will get back to you shortly.</p>
+                <p className="text-navy-600 mb-6">
+                  We've received your request for early access. Our team will be in touch shortly.
+                </p>
                 <Button
                   onClick={() => setIsSubmitted(false)}
                   className="bg-turquoise-500 hover:bg-turquoise-600 text-white"
                 >
-                  Send Another Message
+                  Submit Another Request
                 </Button>
               </div>
             )}

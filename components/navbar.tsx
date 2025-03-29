@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -13,6 +14,8 @@ import { scrollToSection } from "../utils/scroll-to-section"
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
+  const isHomePage = pathname === "/"
 
   // Ajouter une fonction handleWaitlistClick dans le composant Navbar
   // Ajouter cette fonction juste après les hooks useState et useEffect
@@ -35,6 +38,16 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  // Détermine la couleur du texte des liens en fonction de la page et du scroll
+  const linkTextColor =
+    isHomePage && !scrolled ? "text-white hover:text-white/80" : "text-navy-600 hover:text-turquoise-500"
+
+  // Détermine la couleur du bouton en fonction de la page et du scroll
+  const buttonStyle =
+    isHomePage && !scrolled
+      ? "bg-white text-navy-900 hover:bg-white/90"
+      : "bg-turquoise-500 hover:bg-turquoise-600 text-white"
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -48,37 +61,42 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          <Link href="/about" className="text-navy-600 hover:text-turquoise-500 font-medium transition-colors">
+          <Link href="/about" className={`font-medium transition-colors ${linkTextColor}`}>
             About
           </Link>
-          <Link href="/solution" className="text-navy-600 hover:text-turquoise-500 font-medium transition-colors">
+          <Link href="/solution" className={`font-medium transition-colors ${linkTextColor}`}>
             Solution
           </Link>
-          <Link href="/business" className="text-navy-600 hover:text-turquoise-500 font-medium transition-colors">
+          <Link href="/business" className={`font-medium transition-colors ${linkTextColor}`}>
             For Businesses
           </Link>
-          <Link href="/invest" className="text-navy-600 hover:text-turquoise-500 font-medium transition-colors">
+          <Link href="/invest" className={`font-medium transition-colors ${linkTextColor}`}>
             Invest
           </Link>
-          <Link href="/contact" className="text-navy-600 hover:text-turquoise-500 font-medium transition-colors">
+          <Link href="/contact" className={`font-medium transition-colors ${linkTextColor}`}>
             Contact
           </Link>
           <Link href="/#waitlist" onClick={handleWaitlistClick}>
-            <Button className="bg-turquoise-500 hover:bg-turquoise-600 text-white">Join Waitlist</Button>
+            <Button className={buttonStyle}>Join Waitlist</Button>
           </Link>
         </nav>
 
         {/* Mobile Navigation */}
         <div className="flex items-center space-x-2 md:hidden">
           <Link href="/#waitlist" onClick={handleWaitlistClick}>
-            <Button size="sm" className="bg-turquoise-500 hover:bg-turquoise-600 text-white">
+            <Button size="sm" className={buttonStyle}>
               Join Waitlist
             </Button>
           </Link>
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Open Menu">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Open Menu"
+                className={isHomePage && !scrolled ? "text-white" : ""}
+              >
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
